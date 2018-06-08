@@ -15,6 +15,12 @@ export default class Home extends Component<Props> {
           <h2>Home</h2>
           <Link to="/counter">to Counter</Link>
         </div>
+        <Link to="/test">to Test</Link>
+        <div className={styles.backButton} data-tid="backButton">
+          <Link to="/test">
+            <i className="fa fa-arrow-left fa-3x" />
+          </Link>
+        </div>
       </div>
     );
   }
