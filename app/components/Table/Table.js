@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactTable from 'react-table';
 import matchSorter from 'match-sorter';
 import styles from '../Counter.css';
-import { makeData, Logo, Tips } from './Utils';
+import { makeData } from './Utils';
 
 
 export default class table extends Component<Props> {

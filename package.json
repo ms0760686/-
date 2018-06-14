@@ -71,7 +71,14 @@
     "directories": {
       "buildResources": "resources",
       "output": "release"
-    }
+    },
+    "extraFiles": [
+      {
+        "from": "resources/",
+        "to": "node_modules/node-adodb/lib",
+        "filter": ["**/adodb.js"]
+      }
+    ]
   },
   "repository": {
     "type": "git",
