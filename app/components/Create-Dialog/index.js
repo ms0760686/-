@@ -1,3 +1,4 @@
+// @flow
 import React, { Component } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import 'react-dates/initialize';
@@ -18,7 +19,7 @@ const change = {
   密碼: 'Pass',
   單位: 'Postition',
   描述: 'Description',
-  花費點數: 'Point',
+  點數: 'Point',
   活動開始時間: 'StartDate',
   活動截止時間: 'EndDate',
 };
@@ -27,7 +28,6 @@ export default class table extends Component<Props> {
   constructor(props, context) {
     super(props, context);
     this.state = {
-      show: props.show,
       text: props.text,
       fomat: props.fomat,
       focused: {},
@@ -63,25 +63,22 @@ export default class table extends Component<Props> {
   }
 
   crateData = () => {
-    this.setState({ show: false });
+    this.props.setShow(false);
     this.props.createFun(this.state.fomat);
   }
 
   handleClose = () => {
-    this.setState({ show: false });
+    this.props.setShow(false);
   }
 
-  handleShow = () => {
-    this.setState({ show: true });
-  }
   // if (Object.prototype.hasOwnProperty.call(change, key)) {
   replace = (target, changeArr) => {
     const obj = Object.assign({}, target);
     Object.keys(obj).forEach((key) => {
       Object.keys(changeArr).forEach((ckey) => {
         if (key === change[ckey]) {
-          obj[ckey] = obj[key];// eslint-disable-line no-param-reassign
-          delete obj[key];// eslint-disable-line no-param-reassign
+          obj[ckey] = obj[key];
+          delete obj[key];
         }
       });
     });
@@ -142,7 +139,7 @@ export default class table extends Component<Props> {
   render() {
     return (
       <div>
-        <Modal show={this.state.show} onHide={this.handleClose}>
+        <Modal show={this.props.show} onHide={this.handleClose}>
           <Modal.Header closeButton>
             <Modal.Title>{this.state.text}</Modal.Title>
           </Modal.Header>

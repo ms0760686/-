@@ -58,7 +58,10 @@ export default class table extends Component<Props> {
     </button>
   );
   onToggle = () => {
-    this.setState({ toggleActive: !this.state.toggleActive });
+    const LogInit = {
+      show: false,
+    };
+    this.setState({ toggleActive: !this.state.toggleActive, createLog: LogInit });
   }
   DeleteToggle = () => {
     if (this.props.delete) {

@@ -19,7 +19,7 @@ export function readEmployee() {
     dispatch({ type: READ_EMPLOYEE_DATABASE, employee: [], dialog: { show: true, text: 'Loading' } });
     const connection = ADODB.open(connectString);
     connection
-      .query('SELECT  ID,Name,Postition,Format(WorkingDay, "yyyy/mm/dd") AS WorkingDay FROM Employee')
+      .query('SELECT  ID,Name,Postition,Point,Format(WorkingDay, "yyyy/mm/dd") AS WorkingDay FROM Employee')
       .then(data =>
         dispatch({ type: READ_EMPLOYEE, employee: data, dialog: { show: false, text: 'OK' } }))
       .catch(err => {

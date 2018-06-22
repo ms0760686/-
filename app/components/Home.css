@@ -1,8 +1,8 @@
 .container {
-  position: absolute;
-  top: 30%;
-  left: 10px;
+  position: relative;
+  top: 100px;
   text-align: center;
+  margin: auto;
 }
 
 .container h2 {
@@ -11,4 +11,17 @@
 
 .container a {
   font-size: 1.4rem;
+}
+
+.login_panel {
+  margin: auto;
+  width: 50%;
+}
+
+.input {
+  margin: 5px;
+}
+
+.item {
+  min-width: 100px;
 }
