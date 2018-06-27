@@ -4,9 +4,8 @@ import { Link } from 'react-router-dom';
 
 import WelfareTable from './WelfareTable-table/index';
 import WelfareRecordTable from './WelfareRecordTable-table/index';
-import EmployeeTable from './Employee-table/index';
 import Dialog from './Dialog/index';
-import styles from './management.css';
+import styles from './member.css';
 
 type Props = {
   deleteWelfareRecord: () => void,
@@ -15,12 +14,8 @@ type Props = {
   readWelfareRecord: () => void,
   readEmployee: () => void,
   readWelfare: () => void,
-  createEmployee: () => void,
-  createWelfare: () => void,
-  deleteEmployee: () => void,
-  deleteWelfare: () => void,
   editEmployee: () => void,
-  editWelfare: () => void,
+  reserveWelfare: () => void,
   setDialog: () => void,
   employee: Array,
   welfare: Array,
@@ -37,9 +32,9 @@ export default class Test extends Component<Props> {
   props: Props;
   constructor(props, context) {
     super(props, context);
-    props.readEmployee();
+    props.readEmployee(this.props.accInfo.ID);
     props.readWelfare();
-    props.readWelfareRecord();
+    props.readWelfareRecord(this.props.accInfo.ID);
     this.state = {
       log: {
         show: false,
@@ -48,17 +43,17 @@ export default class Test extends Component<Props> {
     };
   }
   componentWillReceiveProps(nextProps) {
-    if (!Object.prototype.hasOwnProperty.call(nextProps.accInfo, 'Account')) {
+    if (!Object.prototype.hasOwnProperty.call(nextProps.accInfo, 'ID')) {
       this.props.history.push('/');// eslint-disable-line
     }
-    if (nextProps.welfareRecordReload) {
-      this.props.readWelfareRecord();
-    }
     if (nextProps.employeeReload) {
-      this.props.readEmployee();
+      this.props.readEmployee(this.props.accInfo.ID);
     }
     if (nextProps.welfareReload) {
       this.props.readWelfare();
+    }
+    if (nextProps.welfareRecordReload) {
+      this.props.readWelfareRecord(this.props.accInfo.ID);
     }
     this.setState({
       log: {
@@ -75,16 +70,15 @@ export default class Test extends Component<Props> {
   }
 
   Reload = () => {
-    this.props.readEmployee();
     this.props.readWelfare();
-    this.props.readWelfareRecord();
+    this.props.readWelfareRecord(this.props.accInfo.ID);
   }
   // onClick={() => { this.createDialog('新增福委會資料', Welfarefomat, createWelfare); }}>
   // onClick={() => { this.props.createEmployee('k', 'l', 'l'); }}>
   // <Table data={payload} />
   render() {
     const {
-      readEmployee, readWelfare, employee, welfare, createEmployee, deleteEmployee, editEmployee, createWelfare, deleteWelfare, editWelfare// eslint-disable-line
+      welfare, employee, welfareRecord, deleteWelfareRecord, editWelfareRecord, crateWelfareRecord, reserveWelfare
     } = this.props;
     return (
       <div>
@@ -101,35 +95,27 @@ export default class Test extends Component<Props> {
         <h1>
         福委會資料
         </h1>
+        <h1>剩餘點數:{employee.length === 1 ? employee[0].Point : null}</h1>
         <WelfareTable
+          createRecordFun={reserveWelfare}
+          editPointFun={this.props.editEmployee}
           data={welfare}
-          deleteFun={deleteWelfare}
-          createFun={createWelfare}
-          editFun={editWelfare}
-          delete
           insertRow
-          cellEdit
-          new
-          selectRow
-        />
-        <h1>
-          員工資料
-        </h1>
-        <EmployeeTable
-          data={employee}
-          deleteFun={deleteEmployee}
-          createFun={createEmployee}
-          editFun={editEmployee}
+          cellEdit={false}
+          reserve
+          setDialog={this.props.setDialog}
+          accInfo={this.props.accInfo}
+          selectRow={false}
         />
         <h1>
         紀錄
         </h1>
         <WelfareRecordTable
-          data={this.props.welfareRecord}
-          deleteFun={this.props.deleteWelfareRecord}
-          createFun={this.props.crateWelfareRecord}
-          editFun={this.props.editWelfareRecord}
-          createRecordFun={this.props.crateWelfareRecord}
+          data={welfareRecord}
+          deleteFun={deleteWelfareRecord}
+          createFun={crateWelfareRecord}
+          editFun={editWelfareRecord}
+          createRecordFun={crateWelfareRecord}
           insertRow={false}
           cellEdit={false}
           selectRow={false}

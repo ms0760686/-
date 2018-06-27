@@ -1,10 +1,8 @@
 // @flow
-import type {} from '../reducers/dialog';
+export const DIALOG = 'DIALOG';
 
-export const ALERT = 'ALERT';
-
-export function alert(_show, _title, _text) {
+export function setDialog(_show, _text) {
   return {
-    type: ALERT, show: _show, title: _title, text: _text,
+    type: DIALOG, dialog: { show: _show, text: _text }
   };
 }

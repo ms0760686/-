@@ -217,7 +217,8 @@
     "react-table": "^6.8.6",
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
-    "source-map-support": "^0.5.3"
+    "source-map-support": "^0.5.3",
+    "uuid": "^3.2.1"
   },
   "devEngines": {
     "node": ">=7.x",

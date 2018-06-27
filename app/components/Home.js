@@ -9,6 +9,7 @@ import styles from './Home.css';
 type Props = {
   login: () => void,
   isLogin: boolean,
+  isManagement: boolean,
   loginID: string,
   alert: object
 };
@@ -23,9 +24,10 @@ export default class Home extends Component<Props> {
     };
   }
   componentWillReceiveProps(nextProps) {
-    if (nextProps.isLogin) {
+    if (nextProps.isLogin && nextProps.isManagement) {
       this.props.history.push('/management');// eslint-disable-line
-      return null;
+    } else if (nextProps.isLogin && !nextProps.isManagement) {
+      this.props.history.push('/member');// eslint-disable-line
     }
   }
 
@@ -88,6 +90,9 @@ export default class Home extends Component<Props> {
           />
           <div className={styles.backButton} data-tid="backButton">
             <Link to="/management">
+              <i className="fa fa-arrow-left fa-3x" />
+            </Link>
+            <Link to="/member">
               <i className="fa fa-arrow-left fa-3x" />
             </Link>
           </div>

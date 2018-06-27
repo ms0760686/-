@@ -97,9 +97,12 @@ export default class table extends Component<Props> {
       insertBtn: this.createCustomInsertButton,
       onCellEdit: this.onCellEdit
     };
-    const selectRowProp = {
-      mode: 'checkbox'
-    };
+    let selectRowProp = {};
+    if (this.state.toggleActive) {
+      selectRowProp = {
+        mode: 'checkbox'
+      };
+    }
     const cellEditProp = {
       mode: 'click'
     };
@@ -116,7 +119,6 @@ export default class table extends Component<Props> {
         <BootstrapTable
           className={customCss.table}
           data={this.state.data}
-          exportCSV
           search
           multiColumnSearch
           deleteRow={this.state.toggleActive}

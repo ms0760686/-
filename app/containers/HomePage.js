@@ -8,6 +8,7 @@ import * as loginActions from '../actions/login';
 function mapStateToProps(state) {
   return {
     isLogin: state.login.isLogin,
+    isManagement: state.login.isManagement,
     loginID: state.login.loginID,
     alert: state.login.dialog.alert
   };

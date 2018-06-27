@@ -2,35 +2,21 @@ import React, { Component } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 
 export default class table extends Component<Props> {
-  constructor(props, context) {
-    super(props, context);
-    this.state = {
-      show: props.show,
-      text: props.text,
-    };
-  }
-  componentWillReceiveProps(nextProps) {
-    this.setState({ show: nextProps.show, text: nextProps.text });
-  }
 
   handleClose = () => {
-    this.setState({ show: false });
-  }
-
-  handleShow = () => {
-    this.setState({ show: true });
+    this.props.setDialog(false, '');
   }
 
   render() {
     return (
       <div>
-        <Modal show={this.state.show} onHide={this.handleClose}>
+        <Modal show={this.props.show} onHide={this.handleClose}>
           <Modal.Header closeButton>
             <Modal.Title>Dialog</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <p>
-              {this.state.text}
+              {this.props.text}
             </p>
           </Modal.Body>
           <Modal.Footer>

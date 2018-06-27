@@ -1,7 +1,7 @@
 // @flow
 import ADODB from 'node-adodb';
-import type {} from '../reducers/management';
-
+import uuidv4 from 'uuid/v4';
+import moment from 'moment';
 
 export const READ_EMPLOYEE_DATABASE = 'READ_EMPLOYEE_DATABASE';
 export const READ_EMPLOYEE = 'READ_EMPLOYEE';
@@ -12,16 +12,41 @@ export const READ_WELFARE_FAILED = 'READ_WELFARE_FAILED';
 export const DIALOG = 'DIALOG';
 export const RELOAD_EMPLOYEE = 'RELOAD_EMPLOYEE';
 export const RELOAD_WELFARE = 'RELOAD_WELFARE';
+export const READ_WELFARE_RECORD_DATABASE = 'READ_WELFARE_RECORD_DATABASE';
+export const READ_WELFARE_RECORD = 'READ_WELFARE_RECORD';
+export const READ_WELFARE_RECORD_FAILED = 'READ_WELFARE_RECORD_FAILED';
+export const RELOAD_WELFARE_RECORD = 'RELOAD_WELFARE_RECORD';
 
+export function memberSys(data) {
+  if (data.length === 1) {
+    return true;
+  }
+  return false;
+}
 const connectString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=\\\\NTSERVER\\AECaspWeb\\yunchung_test\\test.mdb;';
-export function readEmployee() {
+export function readEmployee(ID) {
   return (dispatch) => {
     dispatch({ type: READ_EMPLOYEE_DATABASE, employee: [], dialog: { show: true, text: 'Loading' } });
     const connection = ADODB.open(connectString);
+    let sqlStr = '';
+    if (ID === undefined) {
+      sqlStr = 'SELECT  ID,Name,Postition,Point,Format(WorkingDay, "yyyy/mm/dd") AS WorkingDay FROM Employee';
+    } else {
+      sqlStr = `SELECT  ID,Name,Postition,Point,Format(WorkingDay, "yyyy/mm/dd") AS WorkingDay FROM Employee WHERE ID='${ID}'`;
+    }
     connection
-      .query('SELECT  ID,Name,Postition,Point,Format(WorkingDay, "yyyy/mm/dd") AS WorkingDay FROM Employee')
-      .then(data =>
-        dispatch({ type: READ_EMPLOYEE, employee: data, dialog: { show: false, text: 'OK' } }))
+      .query(sqlStr)
+      .then(data => {
+        if (ID !== undefined) {
+          if (memberSys(data)) {
+            return dispatch({ type: READ_EMPLOYEE, employee: data, dialog: { show: false, text: 'OK' } });
+          }
+          return dispatch({
+            type: READ_EMPLOYEE_FAILED, dialog: { show: true, text: '系統錯誤 (重複ID)' }
+          });
+        }
+        return dispatch({ type: READ_EMPLOYEE, employee: data, dialog: { show: false, text: 'OK' } });
+      })
       .catch(err => {
         dispatch({
           type: READ_EMPLOYEE_FAILED, dialog: { show: true, text: '讀取失敗' }, dbstate: err
@@ -152,6 +177,94 @@ export const editWelfare = (data: object, id: string) => (
       .execute(sqlStr)
       .then(() =>
         dispatch({ type: RELOAD_WELFARE, dialog: { show: false, text: 'OK' } }))
+      .catch(error =>
+        dispatch({ type: DIALOG, dialog: { show: true, text: 'Error' }, dbstate: error }));
+  }
+);
+
+export function readWelfareRecord(ID) {
+  return (dispatch) => {
+    dispatch({ type: READ_WELFARE_RECORD_DATABASE, welfareRecord: [], dialog: { show: true, text: 'Loading' } });
+    let sqlStr = '';
+    if (ID === undefined) {
+      sqlStr = 'SELECT GuidCode,Name,ID,Disabled,ID_Name,Num,Point,TotalPoints,Description,Format(CreateDate, "yyyy/mm/dd") AS CreateDate FROM WelfareRecord';
+    } else {
+      sqlStr = `SELECT GuidCode,Name,ID,Disabled,ID_Name,Num,Point,TotalPoints,Description,Format(CreateDate, "yyyy/mm/dd") AS CreateDate FROM WelfareRecord WHERE ID='${ID}'`;
+    }
+    const connection = ADODB.open(connectString);
+    connection
+      .query(sqlStr)
+      .then(data =>
+        dispatch({ type: READ_WELFARE_RECORD, welfareRecord: data, dialog: { show: false, text: 'OK' } }))
+      .catch(err => {
+        dispatch({
+          type: READ_WELFARE_RECORD_FAILED, dialog: { show: true, text: '讀取失敗' }, dbstate: err
+        });
+      });
+  };
+}
+export function deleteWelfareRecord() {
+  return (dispatch) => {
+
+  };
+}
+export function editWelfareRecord() {
+  return (dispatch) => {
+
+  };
+}
+export const crateWelfareRecord = (data, accInfo, description) => (
+  (dispatch) => {
+    const item = 'Name,Point,TotalPoints,Num,GuidCode,CreateDate,ID,ID_Name,Description,Disabled';
+    const value = `'${data.Name}','${data.Point}','${data.Point * data.Num}','${data.Num}','${uuidv4()}','${moment().format('YYYY/MM/DD')}','${accInfo.ID}','${accInfo.Name}','${description}',false`;
+    const sqlStr = `INSERT INTO WelfareRecord (${item}) VALUES ( ${value})`;
+    dispatch({ type: DIALOG, dialog: { show: true, text: '新增中' } });
+    const connection = ADODB.open(connectString);
+    connection
+      .execute(sqlStr)
+      .then(() =>
+        dispatch({ type: RELOAD_WELFARE_RECORD, dialog: { show: false, text: 'OK' } }))
+      .catch(error =>
+        dispatch({ type: DIALOG, dialog: { show: true, text: 'Error' }, dbstate: error }));
+  }
+);
+
+export function reserveWelfare(data, accInfo, description) {
+  return (dispatch) => {
+    dispatch({ type: READ_EMPLOYEE_DATABASE, employee: [], dialog: { show: true, text: 'Loading' } });
+    const connection = ADODB.open(connectString);
+    const sqlStr = `SELECT  Point FROM Employee WHERE ID='${accInfo.ID}'`;
+    connection
+      .query(sqlStr)
+      .then(reqdata => {
+        if (memberSys(reqdata)) {
+          return dispatch(reserveEditEmployee(
+            { item: 'Point', value: reqdata[0].Point - (data.Point * data.Num) },
+            accInfo,
+            data,
+            description
+          ));
+        }
+        return dispatch({
+          type: READ_EMPLOYEE_FAILED, dialog: { show: true, text: '系統錯誤 (重複ID)' }
+        });
+      })
+      .catch(err => {
+        dispatch({
+          type: READ_EMPLOYEE_FAILED, dialog: { show: true, text: '讀取失敗' }, dbstate: err
+        });
+      });
+  };
+}
+export const reserveEditEmployee = (Employeedata: object, accInfo: object, data, description) => (
+  (dispatch) => {
+    const sqlStr = `UPDATE Employee SET ${Employeedata.item} = '${Employeedata.value}' WHERE ID = '${accInfo.ID}'`;
+    dispatch({ type: DIALOG, dialog: { show: true, text: '更新中' } });
+    const connection = ADODB.open(connectString);
+    connection
+      .execute(sqlStr)
+      .then(() =>
+        dispatch(crateWelfareRecord(data, accInfo, description)))
       .catch(error =>
         dispatch({ type: DIALOG, dialog: { show: true, text: 'Error' }, dbstate: error }));
   }
