@@ -27,7 +27,7 @@ export default class table extends Component<Props> {
         show: false,
         text: '修改密碼',
         editFun: props.editFun,
-        id: '',
+        accInfo: {},
       },
       toggleActive: false
     };
@@ -62,7 +62,7 @@ export default class table extends Component<Props> {
     this.props.deleteFun(ID);
   }
   onCellEdit = (row, fieldName, val) => {
-    this.props.editFun({ item: fieldName, value: val }, row.ID);
+    this.props.editFun({ item: fieldName, value: val }, row);
   }
 
   createCustomInsertButton = () => (
@@ -81,11 +81,13 @@ export default class table extends Component<Props> {
   )
 
   buttonFormatter = (cell, row) => (
-    <Button className="col-xs-12" bsStyle="primary" bsSize="large" onClick={() => this.setState({ passLog: { ...this.state.passLog, id: row.ID, show: true } })}>
+    <Button className="col-xs-12" bsStyle="primary" bsSize="large" onClick={() => this.setState({ passLog: { ...this.state.passLog, accInfo: row, show: true } })}>
       更改密碼
     </Button>
   )
-
+  rowClassNameFormat = (row) => (
+    row.Point < 0 ? `${customCss.alarm_tr}` : ''
+  )
   render() {
     function customConfirm(next, dropRowKeys) {
       dropRowKeys.join(',');
@@ -108,16 +110,19 @@ export default class table extends Component<Props> {
     };
     return (
       <div>
-        <Toggle
-          onClick={this.onToggle}
-          on={<h2>ON</h2>}
-          off={<h2>OFF</h2>}
-          size="xs"
-          offstyle="danger"
-          active={this.state.toggleActive}
-        />
+        <div className={customCss.line}>
+          啟用刪除:{' '}
+          <Toggle
+            onClick={this.onToggle}
+            on={<h2 className={customCss.toggle}>ON</h2>}
+            off={<h2 className={customCss.toggle}>OFF</h2>}
+            size="xs"
+            offstyle="danger"
+            active={this.state.toggleActive}
+          />
+        </div>
         <BootstrapTable
-          className={customCss.table}
+          className={customCss.table100_ver1}
           data={this.state.data}
           search
           multiColumnSearch
@@ -127,8 +132,9 @@ export default class table extends Component<Props> {
           cellEdit={cellEditProp}
           selectRow={selectRowProp}
           options={options}
+          trClassName={this.rowClassNameFormat}
         >
-          <TableHeaderColumn dataField="ID" isKey searchable={false} dataSort>編號</TableHeaderColumn>
+          <TableHeaderColumn dataField="ID" isKey searchable={false} className={customCss.column1} columnClassName={customCss.column1} dataSort>編號</TableHeaderColumn>
           <TableHeaderColumn dataField="Name" dataSort>名稱</TableHeaderColumn>
           <TableHeaderColumn dataField="Postition" dataSort>單位</TableHeaderColumn>
           <TableHeaderColumn dataField="Point" dataSort>剩餘點數</TableHeaderColumn>
@@ -147,7 +153,7 @@ export default class table extends Component<Props> {
           setShow={this.setPassShow}
           text={this.state.passLog.text}
           editFun={this.state.passLog.editFun}
-          id={this.state.passLog.id}
+          accInfo={this.state.passLog.accInfo}
         />
       </div>
     );

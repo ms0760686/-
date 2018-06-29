@@ -29,7 +29,7 @@ export function login(ID: string, Password: string) {
       .then(data => {
         if (sys(data)) {
           return dispatch({
-            type: LOGIN_SUCCESS, isManagement: false, isLogin: true, accInfo: data[0], dialog: { alert: { show: true, text: 'OK', title: '' } }
+            type: LOGIN_SUCCESS, isManagement: false, isLogin: true, accInfo: data[0], dialog: { alert: { show: false, text: 'OK', title: '' } }
           });
         }
         return dispatch(managementLogin(ID, Password));
@@ -55,7 +55,7 @@ export function managementLogin(ID: string, Password: string) {
       .then(data => {
         if (sys(data)) {
           return dispatch({
-            type: LOGIN_SUCCESS, isManagement: true, isLogin: true, accInfo: data[0], dialog: { alert: { show: true, text: 'OK', title: '' } }
+            type: LOGIN_SUCCESS, isManagement: true, isLogin: true, accInfo: data[0], dialog: { alert: { show: false, text: 'OK', title: '' } }
           });
         }
         return dispatch({

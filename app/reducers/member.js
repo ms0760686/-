@@ -13,10 +13,11 @@ import {
   READ_WELFARE_RECORD_DATABASE,
   READ_WELFARE_RECORD,
   READ_WELFARE_RECORD_FAILED,
+  RELOAD_ALL,
 } from '../actions/db';
 
 const initialState = {
-  welfare: [], employee: [], dbstate: '', dialog: { show: false, text: '' }, welfareRecordReload: false, employeeReload: false, welfareReload: false, welfareRecord: []
+  welfare: [], employee: [], welfareRecord: [], dbstate: '', dialog: { show: false, text: '' }, welfareRecordReload: false, employeeReload: false, welfareReload: false
 };
 
 export default function management(state = initialState, action) {
@@ -27,7 +28,7 @@ export default function management(state = initialState, action) {
       };
     case READ_EMPLOYEE_DATABASE:
       return {
-        ...state, employee: action.employee, dialog: action.dialog, employeeReload: false
+        ...state, dialog: action.dialog, employeeReload: false
       };
     case READ_EMPLOYEE:
       return {
@@ -52,7 +53,6 @@ export default function management(state = initialState, action) {
     case READ_WELFARE_RECORD_DATABASE:
       return {
         ...state,
-        welfareRecord: action.welfareRecord,
         dialog: action.dialog,
         welfareRecordReload: false
       };
@@ -80,6 +80,13 @@ export default function management(state = initialState, action) {
       return {
         ...state,
         dialog: action.dialog,
+        welfareRecordReload: true
+      };
+    case RELOAD_ALL:
+      return {
+        ...state,
+        dialog: action.dialog,
+        employeeReload: true,
         welfareRecordReload: true
       };
     default:

@@ -9,12 +9,13 @@ function mapStateToProps(state) {
   return {
     employee: state.management.employee,
     welfare: state.management.welfare,
-    welfareRecord: state.member.welfareRecord,
+    welfareRecord: state.management.welfareRecord,
+    exportWelfare: state.management.exportWelfare,
     dbstate: state.management.dbstate,
     dialog: state.management.dialog,
     employeeReload: state.management.employeeReload,
     welfareReload: state.management.welfareReload,
-    welfareRecordReload: state.member.welfareRecordReload,
+    welfareRecordReload: state.management.welfareRecordReload,
     accInfo: state.login.accInfo,
   };
 }

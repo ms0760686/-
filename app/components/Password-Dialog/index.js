@@ -9,12 +9,12 @@ export default class table extends Component<Props> {
     super(props, context);
     this.state = {
       text: props.text,
-      id: props.id,
+      accInfo: props.accInfo,
       pass: ''
     };
   }
   componentWillReceiveProps(nextProps) {
-    this.setState({ text: nextProps.text, id: nextProps.id });
+    this.setState({ text: nextProps.text, accInfo: nextProps.accInfo });
   }
 
   handleClose = () => {
@@ -23,7 +23,7 @@ export default class table extends Component<Props> {
 
   editPass = () => {
     this.props.setShow(false);
-    this.props.editFun({ item: 'Pass', value: this.state.pass }, this.state.id);
+    this.props.editFun({ item: 'Pass', value: this.state.pass }, this.state.accInfo);
   }
   updateValue = (e) => {
     this.setState({ pass: e.target.value });

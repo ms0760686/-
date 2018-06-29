@@ -1,8 +1,23 @@
 // @flow
-import { READ_EMPLOYEE_DATABASE, READ_EMPLOYEE, READ_EMPLOYEE_FAILED, READ_WELFARE_DATABASE, READ_WELFARE, READ_WELFARE_FAILED, DIALOG, RELOAD_EMPLOYEE, RELOAD_WELFARE } from '../actions/db';
-
+import {
+  READ_EMPLOYEE_DATABASE,
+  READ_EMPLOYEE,
+  READ_EMPLOYEE_FAILED,
+  READ_WELFARE_DATABASE,
+  READ_WELFARE,
+  READ_WELFARE_FAILED,
+  DIALOG,
+  RELOAD_EMPLOYEE,
+  RELOAD_WELFARE,
+  RELOAD_WELFARE_RECORD,
+  READ_WELFARE_RECORD_DATABASE,
+  READ_WELFARE_RECORD,
+  READ_WELFARE_RECORD_FAILED,
+  ADD_EXPORT_DATA,
+  DELETE_EXPORT_DATA,
+} from '../actions/db';
 const initialState = {
-  welfare: [], employee: [], dbstate: '', dialog: { show: false, text: '' }, employeeReload: false, welfareReload: false
+  exportWelfare: [], welfare: [], employee: [], welfareRecord: [], dbstate: '', dialog: { show: false, text: '' }, welfareRecordReload: false, employeeReload: false, welfareReload: false
 };
 
 export default function management(state = initialState, action) {
@@ -13,7 +28,7 @@ export default function management(state = initialState, action) {
       };
     case READ_EMPLOYEE_DATABASE:
       return {
-        ...state, employee: action.employee, dialog: action.dialog, employeeReload: false
+        ...state, dialog: action.dialog, employeeReload: false
       };
     case READ_EMPLOYEE:
       return {
@@ -46,6 +61,38 @@ export default function management(state = initialState, action) {
         ...state,
         dialog: action.dialog,
         welfareReload: true
+      };
+    case READ_WELFARE_RECORD_DATABASE:
+      return {
+        ...state,
+        dialog: action.dialog,
+        welfareRecordReload: false
+      };
+    case READ_WELFARE_RECORD:
+      return {
+        ...state, welfareRecord: action.welfareRecord, dialog: action.dialog
+      };
+    case READ_WELFARE_RECORD_FAILED:
+      return {
+        ...state, dbstate: action.dbstate, dialog: action.dialog
+      };
+    case RELOAD_WELFARE_RECORD:
+      return {
+        ...state,
+        dialog: action.dialog,
+        employeeReload: true,
+        welfareRecordReload: true
+      };
+    case ADD_EXPORT_DATA:
+      return {
+        ...state,
+        exportWelfare: state.exportWelfare.concat(action.exportWelfare),
+        dialog: action.dialog,
+      };
+    case DELETE_EXPORT_DATA:
+      return {
+        ...state,
+        exportWelfare: [],
       };
     default:
       return state;

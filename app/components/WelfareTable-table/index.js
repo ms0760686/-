@@ -70,11 +70,11 @@ export default class table extends Component<Props> {
     };
     this.setState({ createLog: LogInit });
   }
-  onCellDelete = (Name) => {
-    this.props.deleteFun(Name);
+  onCellDelete = (GuidKey) => {
+    this.props.deleteFun(GuidKey);
   }
   onCellEdit = (row, fieldName, val) => {
-    this.props.editFun({ item: fieldName, value: val }, row.Name);
+    this.props.editFun({ item: fieldName, value: val }, row.GuidKey);
   }
 
   createCustomInsertButton = () => (
@@ -94,14 +94,17 @@ export default class table extends Component<Props> {
   DeleteToggle = () => {
     if (this.props.delete) {
       return (
-        <Toggle
-          onClick={this.onToggle}
-          on={<h2>ON</h2>}
-          off={<h2>OFF</h2>}
-          size="xs"
-          offstyle="danger"
-          active={this.state.toggleActive}
-        />
+        <div className={customCss.line}>
+          啟用刪除:{' '}
+          <Toggle
+            onClick={this.onToggle}
+            on={<h2 className={customCss.toggle}>ON</h2>}
+            off={<h2 className={customCss.toggle}>OFF</h2>}
+            size="xs"
+            offstyle="danger"
+            active={this.state.toggleActive}
+          />
+        </div>
       );
     }
     return null;
@@ -153,7 +156,7 @@ export default class table extends Component<Props> {
       <div>
         {this.DeleteToggle()}
         <BootstrapTable
-          className={customCss.table}
+          className={customCss.table100_ver1}
           data={this.state.data}
           search
           multiColumnSearch
@@ -164,13 +167,14 @@ export default class table extends Component<Props> {
           selectRow={selectRowProp}
           options={options}
         >
-          <TableHeaderColumn dataField="Name" isKey searchable={false} dataSort>名稱</TableHeaderColumn>
+          <TableHeaderColumn dataField="GuidKey" hidden isKey />
+          <TableHeaderColumn dataField="Name" className={customCss.column1} columnClassName={customCss.column1} searchable={false} dataSort>名稱</TableHeaderColumn>
           <TableHeaderColumn dataField="Description" dataSort>描述</TableHeaderColumn>
-          <TableHeaderColumn dataField="Point" dataSort>花費點數</TableHeaderColumn>
-          <TableHeaderColumn dataField="StartDate" dataSort>活動開始時間</TableHeaderColumn>
-          <TableHeaderColumn dataField="EndDate" dataSort>活動截止時間</TableHeaderColumn>
+          <TableHeaderColumn dataField="Point" dataSort width="106">花費點數</TableHeaderColumn>
+          <TableHeaderColumn dataField="StartDate" dataSort width="106">活動開始日</TableHeaderColumn>
+          <TableHeaderColumn dataField="EndDate" dataSort width="106">活動截止日</TableHeaderColumn>
           {this.props.reserve ?
-            <TableHeaderColumn dataField="action" dataFormat={this.buttonFormatter} editable={false} export={false} dataSort>預約</TableHeaderColumn>
+            <TableHeaderColumn dataField="action" width="90" dataFormat={this.buttonFormatter} editable={false} export={false} dataSort>預約</TableHeaderColumn>
            : null}
         </BootstrapTable>
         <CreateDialog

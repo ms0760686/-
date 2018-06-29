@@ -1,3 +1,17 @@
 .back {
-    color: white;
+    color: rgb(186, 193, 226);
+}
+.title {
+    color: #5a5a5a;
+    font-family: "Open Sans", Arial, sans-serif;
+    font-weight: 400;
+    text-align: center;
+    line-height: 1.1;
+    font-size: 24px;
+}
+.line {
+    border: 0.5px;
+    border-top-style: solid;
+    border-top-color: #f1f1f1;
+    padding: 10px;
 }

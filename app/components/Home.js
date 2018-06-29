@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Form, FormGroup, Col, FormControl, Checkbox, ControlLabel, Panel } from 'react-bootstrap';
+import { Button, Form, FormGroup, Col, FormControl, ControlLabel, Panel } from 'react-bootstrap';
 
 import Alert from './Alert/index';
 import styles from './Home.css';
@@ -44,7 +44,6 @@ export default class Home extends Component<Props> {
         <div className={styles.container} data-tid="container">
           <h2>Home</h2>
           {loginID}
-          <Link to="/counter">to Counter</Link>
           <Panel bsStyle="success">
             <Panel.Heading>
               <Panel.Title componentClass="h3">登入資訊</Panel.Title>
@@ -66,12 +65,6 @@ export default class Home extends Component<Props> {
                   </Col>
                   <Col sm={10}>
                     <FormControl type="password" placeholder="Password" onChange={(e) => this.setState({ Password: e.target.value })} />
-                  </Col>
-                </FormGroup>
-
-                <FormGroup>
-                  <Col smOffset={2} sm={10}>
-                    <Checkbox>Remember me</Checkbox>
                   </Col>
                 </FormGroup>
 

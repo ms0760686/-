@@ -1,40 +1,19 @@
 import React, { Component } from 'react';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import moment from 'moment';
 import Toggle from 'react-bootstrap-toggle';
 
 import customCss from './index.css';
-import CreateDialog from '../Create-Dialog/index';
 
-const changgge = {
-  ID: '員工編號',
-  Name: '名稱',
-  Pass: '密碼',
-  Num: '數量',
-  Description: '描述',
-  Point: '點數',
-  CreateDate: '建立時間',
-  ID_Name: '員工名稱',
-  TotalPoints: '合計點數'
-};
 export default class table extends Component<Props> {
   constructor(props, context) {
     super(props, context);
     this.state = {
       data: [],
-      createLog: {
-        show: false,
-        text: '',
-        fomat: {},
-      },
       toggleActive: false
     };
   }
   componentWillReceiveProps(nextProps) {
-    const LogInit = {
-      show: false,
-    };
-    this.setState({ data: this.replace(nextProps.data, this.change()), createLog: LogInit });
+    this.setState({ data: this.replace(this.sum(nextProps.data, this.state.toggleActive), this.change()) });
   }
   replace = (target, changeArr) => {
     const arrObj = Object.assign([], target);
@@ -47,6 +26,33 @@ export default class table extends Component<Props> {
           }
         });
       });
+    });
+    return arrObj;
+  }
+  sum = (target, bool) => {
+    let SumTotalPoints = 0;
+    const arrObj = JSON.parse(JSON.stringify(target));
+    for (let i = 0; i < arrObj.length - 1; i += 1) {
+      SumTotalPoints += arrObj[i].TotalPoints;
+      for (let j = i + 1; j < arrObj.length; j += 1) {
+        if (bool) {
+          if (arrObj[j].EmployeeID === arrObj[i].EmployeeID &&
+            arrObj[j].WelfareGuid === arrObj[i].WelfareGuid) {
+            arrObj[i].TotalPoints += arrObj[j].TotalPoints;
+            arrObj.splice(j, 1);
+            j -= 1;
+          }
+        } else if (arrObj[j].WelfareGuid === arrObj[i].WelfareGuid) {
+          arrObj[i].Num += arrObj[j].Num;
+          arrObj[i].TotalPoints += arrObj[j].TotalPoints;
+          SumTotalPoints += arrObj[j].TotalPoints;
+          arrObj.splice(j, 1);
+          j -= 1;
+        }
+      }
+    }
+    arrObj.push({
+      EmployeeID: '', Name: '合計', Num: '', Description: '', EmployeeID_Name: '', TotalPoints: SumTotalPoints, Point: ''
     });
     return arrObj;
   }
@@ -63,59 +69,15 @@ export default class table extends Component<Props> {
       TotalPoints: '合計點數'
     }
   )
-  onInsert = () => {
-    const Welfarefomat = {
-      Name: '',
-      Description: '',
-      Point: '',
-      StartDate: moment().format('YYYY/MM/DD'),
-      EndDate: moment().format('YYYY/MM/DD'),
-    };
-    const LogInit = {
-      show: true,
-      text: '新增活動資料',
-      fomat: Welfarefomat,
-      createFun: this.props.createFun
-    };
-    this.setState({ createLog: LogInit });
-  }
-  onCellDelete = (Name) => {
-    this.props.deleteFun(Name);
-  }
-  onCellEdit = (row, fieldName, val) => {
-    this.props.editFun({ item: fieldName, value: val }, row.Name);
-  }
 
-  createCustomInsertButton = () => (
-    <button onClick={this.onInsert} type="button" className="btn btn-info react-bs-table-add-btn">
-      <span>
-        <i className="fa glyphicon glyphicon-plus fa-plus" /> New
-      </span>
-    </button>
-  );
   onToggle = () => {
-    const LogInit = {
-      show: false,
-    };
-    this.setState({ toggleActive: !this.state.toggleActive, createLog: LogInit });
-  }
-  DeleteToggle = () => {
-    if (this.props.delete) {
-      return (
-        <div className={customCss.line}>
-          啟用刪除:{' '}
-          <Toggle
-            onClick={this.onToggle}
-            on={<h2 className={customCss.toggle}>ON</h2>}
-            off={<h2 className={customCss.toggle}>OFF</h2>}
-            size="xs"
-            offstyle="danger"
-            active={this.state.toggleActive}
-          />
-        </div>
-      );
-    }
-    return null;
+    this.setState({
+      data: this.replace(
+        this.sum(this.props.data, !this.state.toggleActive),
+        this.change(),
+      )
+    });
+    this.setState({ toggleActive: !this.state.toggleActive });
   }
 
   render() {
@@ -144,14 +106,23 @@ export default class table extends Component<Props> {
     }
     return (
       <div>
-        {this.DeleteToggle()}
+        <div className={customCss.line}>
+          切換預覽 (顯示人員):{' '}
+          <Toggle
+            onClick={this.onToggle}
+            on={<h2 className={customCss.toggle}>ON</h2>}
+            off={<h2 className={customCss.toggle}>OFF</h2>}
+            size="xs"
+            offstyle="danger"
+            active={this.state.toggleActive}
+          />
+        </div>
         <BootstrapTable
           className={customCss.table100_ver1}
           data={this.state.data}
           search
           exportCSV
           multiColumnSearch
-          deleteRow={this.state.toggleActive}
           pagination
           insertRow={this.props.insertRow}
           cellEdit={cellEditProp}
@@ -171,17 +142,10 @@ export default class table extends Component<Props> {
           <TableHeaderColumn dataField={this.change().Point} dataSort>點數</TableHeaderColumn>
           <TableHeaderColumn dataField={this.change().Num} dataSort>數量</TableHeaderColumn>
           <TableHeaderColumn dataField={this.change().TotalPoints} dataSort>合計點數</TableHeaderColumn>
-          <TableHeaderColumn dataField={this.change().EmployeeID} dataSort>員工名稱</TableHeaderColumn>
-          <TableHeaderColumn dataField={this.change().Description} dataSort export={false}>備註</TableHeaderColumn>
-          <TableHeaderColumn dataField={this.change().CreateDate} dataSort export={false}>創建時間</TableHeaderColumn>
+          <TableHeaderColumn dataField={this.change().EmployeeID_Name} hidden={!this.state.toggleActive} dataSort export={this.state.toggleActive}>員工名稱</TableHeaderColumn>
+          <TableHeaderColumn dataField={this.change().Description} hidden={!this.state.toggleActive} dataSort export={false}>備註</TableHeaderColumn>
+          <TableHeaderColumn dataField={this.change().CreateDate} hidden={!this.state.toggleActive} dataSort export={false}>創建時間</TableHeaderColumn>
         </BootstrapTable>
-        <CreateDialog
-          show={this.state.createLog.show}
-          setShow={this.setCreateShow}
-          text={this.state.createLog.text}
-          fomat={this.state.createLog.fomat}
-          createFun={this.state.createLog.createFun}
-        />
       </div>
     );
   }
