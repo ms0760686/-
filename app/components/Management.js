@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Button, Form, Panel } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
+import ConfirmDialog from './Confirm-Dialog/index';
 import PasswordDialog from './Password-Dialog/index';
 import WelfareTable from './WelfareTable-table/index';
 import WelfareRecordTable from './WelfareRecordTable-table/index';
@@ -11,7 +12,6 @@ import Dialog from './Dialog/index';
 import styles from './management.css';
 
 type Props = {
-  editWelfareRecord: () => void,
   crateWelfareRecord: () => void,
   readWelfareRecord: () => void,
   readEmployee: () => void,
@@ -25,6 +25,7 @@ type Props = {
   setDialog: () => void,
   exportRecord: () => void,
   editManagement: () => void,
+  AnnualSettlement: () => void,
   employee: Array,
   welfare: Array,
   welfareRecord: Array,
@@ -41,10 +42,7 @@ export default class Test extends Component<Props> {
   props: Props;
   constructor(props, context) {
     super(props, context);
-    props.exportRecord();
-    props.readEmployee();
-    props.readWelfare();
-    props.readWelfareRecord();
+    setTimeout(this.Reload(), 500);
     this.state = {
       log: {
         show: false,
@@ -55,6 +53,12 @@ export default class Test extends Component<Props> {
         text: '修改管理員密碼',
         editFun: props.editManagement,
         accInfo: props.accInfo,
+      },
+      confirmLog: {
+        show: false,
+        text: '確認結算',
+        exeFun: props.AnnualSettlement,
+        data: {},
       },
     };
   }
@@ -87,11 +91,15 @@ export default class Test extends Component<Props> {
   setPassShow = (b) => (
     this.setState({ passLog: { ...this.state.passLog, show: b } })
   )
+  setconfirmShow = (b) => (
+    this.setState({ confirmLog: { ...this.state.confirmLog, show: b } })
+  )
+
   Reload = () => {
     this.props.exportRecord();
-    this.props.readEmployee();
-    this.props.readWelfare();
-    this.props.readWelfareRecord();
+    setTimeout(this.props.readEmployee(), 500);
+    setTimeout(this.props.readWelfare(), 1000);
+    setTimeout(this.props.readWelfareRecord(), 1500);
   }
   // onClick={() => { this.createDialog('新增福委會資料', Welfarefomat, createWelfare); }}>
   // onClick={() => { this.props.createEmployee('k', 'l', 'l'); }}>
@@ -107,12 +115,16 @@ export default class Test extends Component<Props> {
             <i className="fa fa-arrow-left fa-3x" />
           </Link>
         </div>
+        <div className={styles.line} />
         <div className="col-4">
           <Button bsStyle="primary" bsSize="large" onClick={this.Reload}>
             Refresh
           </Button>
           <Button bsStyle="primary" bsSize="large" onClick={() => this.setState({ passLog: { ...this.state.passLog, accInfo: this.props.accInfo, show: true } })}>
             更改SA密碼
+          </Button>
+          <Button bsStyle="primary" bsSize="large" onClick={() => this.setState({ confirmLog: { ...this.state.confirmLog, show: true } })}>
+            年度結算
           </Button>
         </div>
         <div className={styles.line} />
@@ -168,7 +180,6 @@ export default class Test extends Component<Props> {
               <WelfareRecordTable
                 data={this.props.welfareRecord}
                 createFun={this.props.crateWelfareRecord}
-                editFun={this.props.editWelfareRecord}
                 createRecordFun={this.props.crateWelfareRecord}
                 insertRow={false}
                 cellEdit={false}
@@ -189,7 +200,6 @@ export default class Test extends Component<Props> {
               <ExportRecordTable
                 data={this.props.exportWelfare}
                 createFun={this.props.crateWelfareRecord}
-                editFun={this.props.editWelfareRecord}
                 createRecordFun={this.props.crateWelfareRecord}
                 insertRow={false}
                 cellEdit={false}
@@ -210,6 +220,13 @@ export default class Test extends Component<Props> {
           text={this.state.passLog.text}
           editFun={this.state.passLog.editFun}
           accInfo={this.state.passLog.accInfo}
+        />
+        <ConfirmDialog
+          show={this.state.confirmLog.show}
+          setShow={this.setconfirmShow}
+          text={this.state.confirmLog.text}
+          exeFun={this.state.confirmLog.exeFun}
+          data={this.state.confirmLog.data}
         />
       </div>
     );

@@ -81,14 +81,6 @@ export default class Home extends Component<Props> {
             title={this.props.alert.title}
             text={this.props.alert.text}
           />
-          <div className={styles.backButton} data-tid="backButton">
-            <Link to="/management">
-              <i className="fa fa-arrow-left fa-3x" />
-            </Link>
-            <Link to="/member">
-              <i className="fa fa-arrow-left fa-3x" />
-            </Link>
-          </div>
         </div>
       </div>
     );

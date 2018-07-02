@@ -15,6 +15,7 @@ import {
   READ_WELFARE_RECORD_FAILED,
   ADD_EXPORT_DATA,
   DELETE_EXPORT_DATA,
+  RELOAD_ALL
 } from '../actions/db';
 const initialState = {
   exportWelfare: [], welfare: [], employee: [], welfareRecord: [], dbstate: '', dialog: { show: false, text: '' }, welfareRecordReload: false, employeeReload: false, welfareReload: false
@@ -93,6 +94,13 @@ export default function management(state = initialState, action) {
       return {
         ...state,
         exportWelfare: [],
+      };
+    case RELOAD_ALL:
+      return {
+        ...state,
+        dialog: action.dialog,
+        employeeReload: true,
+        welfareRecordReload: true
       };
     default:
       return state;

@@ -315,3 +315,109 @@ export const editManagement = (data: object, accInfo: object) => (
         dispatch({ type: DIALOG, dialog: { show: true, text: 'Error' }, dbstate: error }));
   }
 );
+
+export function AnnualSettlement(setDate) {
+  return (dispatch) => {
+    dispatch({ type: READ_EMPLOYEE_DATABASE, dialog: { show: true, text: 'Loading' } });
+    const connection = ADODB.open(connectString);
+    let sqlStr = '';
+    sqlStr = 'SELECT  ID,Name,Postition,Point,Format(WorkingDay, "yyyy/mm/dd") AS WorkingDay FROM Employee';
+    connection
+      .query(sqlStr)
+      .then(data =>
+        dispatch(AnnualSettlementPoint2(data, setDate, 0)))
+      .catch(err => {
+        dispatch({
+          type: READ_EMPLOYEE_FAILED, dialog: { show: true, text: '讀取失敗' }, dbstate: err
+        });
+      });
+  };
+}
+// AnnualSettlementPoint(data, setDate)
+const yearPoint = {
+  0: 130,
+  1: 130,
+  2: 150,
+  3: 180,
+  4: 210,
+  5: 240
+};
+
+const AnnualSettlementPoint2 = (employeedata, setDate, index) => (
+  (dispatch) => {
+    const type = index === employeedata.length - 1 ? { type: RELOAD_EMPLOYEE, dialog: { show: false, text: 'OK' } } : { type: DIALOG, dialog: { show: true, text: 'Loding' } };
+    let workYear = 0;
+    const workingDayM = moment(`${employeedata[index].WorkingDay} 00:00:00`, 'YYYY/MM/DD hh:mm:ss');
+    const setDateM = moment(`${setDate}, 00:00:00`, 'YYYY/MM/DD hh:mm:ss');
+    workingDayM.add(1, 'years');
+    while (workingDayM <= setDateM) {
+      workYear += 1;
+      workingDayM.add(1, 'years');
+    }
+    let cPoint;
+    if (workYear >= 5) {
+      cPoint = 240;
+    } else {
+      cPoint = yearPoint[`${workYear}`];
+    }
+
+    if (employeedata[index].Point > cPoint * 0.4) {
+      cPoint += cPoint * 0.4;
+    } else {
+      cPoint += employeedata[index].Point;
+    }
+    let sqlStr = '';
+
+    if (index !== employeedata.length - 1) {
+      setTimeout(() => {
+        dispatch(AnnualSettlementPoint2(employeedata, setDate, index + 1));
+      }, 300);
+    }
+    sqlStr = `UPDATE Employee SET Point = '${cPoint}' WHERE ID = '${employeedata[index].ID}'`;
+    const connection = ADODB.open(connectString);
+    connection
+      .execute(sqlStr)
+      .then(() =>
+        dispatch(type))
+      .catch(error =>
+        dispatch({ type: DIALOG, dialog: { show: true, text: 'Error' }, dbstate: error }));
+  });
+
+function AnnualSettlementPoint(employeeData, setDate) {
+  return (dispatch) => {
+    Object.entries(employeeData).forEach((obj, index) => {
+      dispatch({ type: DIALOG, dialog: { show: true, text: 'Loading' } });
+      const type = index === employeeData.length - 1 ? { type: RELOAD_EMPLOYEE, dialog: { show: false, text: 'OK' } } : { type: DIALOG, dialog: { show: true, text: 'Loding' } };
+      let workYear = 0;
+      const workingDayM = moment(`${obj[1].WorkingDay} 00:00:00`, 'YYYY/MM/DD hh:mm:ss');
+      const setDateM = moment(`${setDate}, 00:00:00`, 'YYYY/MM/DD hh:mm:ss');
+      workingDayM.add(1, 'years');
+      while (workingDayM <= setDateM) {
+        workYear += 1;
+        workingDayM.add(1, 'years');
+      }
+      let cPoint;
+      if (workYear >= 5) {
+        cPoint = 240;
+      } else {
+        cPoint = yearPoint[`${workYear}`];
+      }
+
+      if (obj[1].Point > cPoint * 0.4) {
+        cPoint += cPoint * 0.4;
+      } else {
+        cPoint += obj[1].Point;
+      }
+      let sqlStr = '';
+      sqlStr = `UPDATE Employee SET Point = '${cPoint}' WHERE ID = '${obj[1].ID}'`;
+      dispatch({ type: DIALOG, dialog: { show: true, text: '結算中' } });
+      const connection = ADODB.open(connectString);
+      connection
+        .execute(sqlStr)
+        .then(() =>
+          dispatch(type))
+        .catch(error =>
+          dispatch({ type: DIALOG, dialog: { show: true, text: 'Error' }, dbstate: error }));
+    });
+  };
+}
