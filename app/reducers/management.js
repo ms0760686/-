@@ -84,10 +84,16 @@ export default function management(state = initialState, action) {
         employeeReload: true,
         welfareRecordReload: true
       };
-    case ADD_EXPORT_DATA:
+    /*case ADD_EXPORT_DATA:
       return {
         ...state,
         exportWelfare: state.exportWelfare.concat(action.exportWelfare),
+        dialog: action.dialog,
+      };*/
+      case ADD_EXPORT_DATA:
+      return {
+        ...state,
+        exportWelfare: action.exportWelfare,
         dialog: action.dialog,
       };
     case DELETE_EXPORT_DATA:

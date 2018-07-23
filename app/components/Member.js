@@ -8,7 +8,7 @@ import Dialog from './Dialog/index';
 import styles from './member.css';
 
 type Props = {
-  editWelfareRecord: () => void,
+  deleteWelfareRecord: () => void,
   crateWelfareRecord: () => void,
   readWelfareRecord: () => void,
   readEmployee: () => void,
@@ -78,7 +78,7 @@ export default class Test extends Component<Props> {
   // <Table data={payload} />
   render() {
     const {
-      welfare, employee, welfareRecord, deleteWelfareRecord, editWelfareRecord, crateWelfareRecord, reserveWelfare
+      welfare, employee, welfareRecord, deleteWelfareRecord, crateWelfareRecord, reserveWelfare
     } = this.props;
     return (
       <div>
@@ -103,19 +103,17 @@ export default class Test extends Component<Props> {
             </h3>
           </Panel.Heading>
           <Panel.Body>
-            <Form horizontal>
-              <WelfareTable
-                createRecordFun={reserveWelfare}
-                editPointFun={this.props.editEmployee}
-                data={welfare}
-                insertRow
-                cellEdit={false}
-                reserve
-                setDialog={this.props.setDialog}
-                accInfo={this.props.accInfo}
-                selectRow={false}
-              />
-            </Form>
+            <WelfareTable
+              createRecordFun={reserveWelfare}
+              editPointFun={this.props.editEmployee}
+              data={welfare}
+              insertRow
+              cellEdit={false}
+              reserve
+              setDialog={this.props.setDialog}
+              accInfo={this.props.accInfo}
+              selectRow={false}
+            />
           </Panel.Body>
         </Panel>
         <div className={styles.line} />
@@ -126,19 +124,16 @@ export default class Test extends Component<Props> {
             </h3>
           </Panel.Heading>
           <Panel.Body>
-            <Form horizontal>
-              <WelfareRecordTable
-                data={welfareRecord}
-                deleteFun={deleteWelfareRecord}
-                createFun={crateWelfareRecord}
-                editFun={editWelfareRecord}
-                createRecordFun={crateWelfareRecord}
-                insertRow={false}
-                cellEdit={false}
-                selectRow={false}
-                setDialog={this.props.setDialog}
-              />
-            </Form>
+            <WelfareRecordTable
+              data={welfareRecord}
+              deleteFun={deleteWelfareRecord}
+              createFun={crateWelfareRecord}
+              createRecordFun={crateWelfareRecord}
+              insertRow={false}
+              cellEdit={false}
+              selectRow={false}
+              setDialog={this.props.setDialog}
+            />
           </Panel.Body>
         </Panel>
         <Dialog

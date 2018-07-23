@@ -6,17 +6,7 @@ import Toggle from 'react-bootstrap-toggle';
 import customCss from './index.css';
 import CreateDialog from '../Create-Dialog/index';
 
-const changgge = {
-  ID: '員工編號',
-  Name: '名稱',
-  Pass: '密碼',
-  Num: '數量',
-  Description: '描述',
-  Point: '點數',
-  CreateDate: '建立時間',
-  ID_Name: '員工名稱',
-  TotalPoints: '合計點數'
-};
+
 export default class table extends Component<Props> {
   constructor(props, context) {
     super(props, context);
@@ -117,6 +107,20 @@ export default class table extends Component<Props> {
     }
     return null;
   }
+  onReserve = (row) => {
+    if (moment(`${row.EndDate} 23:59:59`, 'YYYY/MM/DD hh:mm:ss', 'YYYY/MM/DD') < moment()) {
+      this.props.setDialog(true, '已截止');
+    } else {
+      this.props.deleteFun(row.GuidKey, row[this.change().EmployeeID], row.WelfareGuid, row[this.change().TotalPoints]);
+    }
+  }
+  buttonFormatter = (cell, row) => (
+    <button onClick={() => this.onReserve(row)} type="button" className="btn btn-info react-bs-table-add-btn">
+      <span>
+        <i className="fa glyphicon glyphicon-plus fa-plus" /> 取消預約
+      </span>
+    </button>
+  )
 
   render() {
     function customConfirm(next, dropRowKeys) {
@@ -174,6 +178,7 @@ export default class table extends Component<Props> {
           <TableHeaderColumn dataField={this.change().EmployeeID} dataSort>員工名稱</TableHeaderColumn>
           <TableHeaderColumn dataField={this.change().Description} dataSort export={false}>備註</TableHeaderColumn>
           <TableHeaderColumn dataField={this.change().CreateDate} dataSort export={false}>創建時間</TableHeaderColumn>
+          <TableHeaderColumn dataField="action" dataFormat={this.buttonFormatter} hidden={false} editable={false} export={false} />
         </BootstrapTable>
         <CreateDialog
           show={this.state.createLog.show}

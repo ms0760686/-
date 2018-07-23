@@ -26,7 +26,7 @@ export function memberSys(data) {
   }
   return false;
 }
-const connectString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=\\\\NTSERVER\\AECaspWeb\\yunchung_test\\test.mdb;';
+const connectString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=\\\\NTSERVER\\AECaspWeb\\yunchung_test\\testDB\\test.mdb;';
 export function readEmployee(ID) {
   return (dispatch) => {
     dispatch({ type: READ_EMPLOYEE_DATABASE, dialog: { show: true, text: 'Loading' } });
@@ -195,7 +195,9 @@ export function readWelfareRecord(ID) {
     if (ID === undefined) {
       sqlStr = 'SELECT WelfareGuid,Name,EmployeeID,EmployeeID_Name,Num,Point,TotalPoints,Description,Format(CreateDate, "yyyy/mm/dd") AS CreateDate FROM WelfareRecord';
     } else {
-      sqlStr = `SELECT WelfareGuid,Name,EmployeeID,EmployeeID_Name,Num,Point,TotalPoints,Description,Format(CreateDate, "yyyy/mm/dd") AS CreateDate FROM WelfareRecord WHERE EmployeeID='${ID}'`;
+      sqlStr = `SELECT A.GuidKey,A.WelfareGuid,A.Name,A.EmployeeID,A.EmployeeID_Name,A.Num,A.Point,A.TotalPoints,A.Description,
+      Format(A.CreateDate, "yyyy/mm/dd") AS CreateDate, Format(B.EndDate, "yyyy/mm/dd") As EndDate FROM WelfareRecord As A, corporatewelfare As B
+      WHERE A.EmployeeID='${ID}' AND B.GuidKey = A.WelfareGuid`;
     }
     const connection = ADODB.open(connectString);
     connection
@@ -210,6 +212,22 @@ export function readWelfareRecord(ID) {
   };
 }
 export function exportRecord() {
+  return (dispatch) => {
+    dispatch({ type: DELETE_EXPORT_DATA, dialog: { show: true, text: 'Loading' } });
+    const connection = ADODB.open(connectString);
+    connection
+      .query('select A.WelfareGuid, A.Name, A.EmployeeID, A.EmployeeID_Name, A.Num,A.Point, A.TotalPoints, A.Description,Format(A.CreateDate, "yyyy/mm/dd") AS CreateDate, Format(B.EndDate, "yyyy/mm/dd") As EndDate FROM WelfareRecord As A , corporatewelfare As B WHERE A.welfareGuid = B.GuidKey')
+      .then(data =>
+        dispatch({ type: ADD_EXPORT_DATA, exportWelfare: data, dialog: { show: false, text: 'OK' } }))
+      .catch(err => {
+        dispatch({
+          type: READ_WELFARE_FAILED, dialog: { show: true, text: '讀取失敗' }, dbstate: err
+        });
+      });
+  };
+}
+
+/*export function exportRecordTest() {
   return (dispatch) => {
     dispatch({ type: DELETE_EXPORT_DATA, dialog: { show: true, text: 'Loading' } });
     const connection = ADODB.open(connectString);
@@ -243,12 +261,12 @@ function exportReadRecord(welfareData) {
         });
     });
   };
-}
+}*/
 
 export const crateWelfareRecord = (data, accInfo, description) => (
   (dispatch) => {
-    const item = 'Name,Point,TotalPoints,Num,WelfareGuid,CreateDate,EmployeeID,EmployeeID_Name,Description';
-    const value = `'${data.Name}','${data.Point}','${data.Point * data.Num}','${data.Num}','${data.GuidKey}','${moment().format('YYYY/MM/DD')}','${accInfo.ID}','${accInfo.Name}','${description}'`;
+    const item = 'GuidKey,Name,Point,TotalPoints,Num,WelfareGuid,CreateDate,EmployeeID,EmployeeID_Name,Description';
+    const value = `'${uuidv4()}','${data.Name}','${data.Point}','${data.Point * data.Num}','${data.Num}','${data.GuidKey}','${moment().format('YYYY/MM/DD')}','${accInfo.ID}','${accInfo.Name}','${description}'`;
     const sqlStr = `INSERT INTO WelfareRecord (${item}) VALUES ( ${value})`;
     dispatch({ type: DIALOG, dialog: { show: true, text: '新增中' } });
     const connection = ADODB.open(connectString);
@@ -421,3 +439,64 @@ function AnnualSettlementPoint(employeeData, setDate) {
     });
   };
 }
+export const deleteWelfareRecord = (Guid, EmployeeID, WelfareGuid, TotalPoint) => (
+  (dispatch) => {
+    const sqlStr = `SELECT * FROM WelfareRecord WHERE GuidKey = '${Guid}' AND EmployeeID = '${EmployeeID}' AND WelfareGuid = '${WelfareGuid}'`;
+    dispatch({ type: DIALOG, dialog: { show: true, text: '刪除中' } });
+    const connection = ADODB.open(connectString);
+    connection
+      .query(sqlStr)
+      .then((data =>
+        dispatch(updatePoint(data, Guid, EmployeeID, WelfareGuid, TotalPoint))))
+      .catch(error =>
+        dispatch({ type: DIALOG, dialog: { show: true, text: 'Error' }, dbstate: error }));
+  }
+);
+//updatePoint(EmployeeID, TotalPoint)
+export const updatePoint = (data, Guid, EmployeeID, WelfareGuid, TotalPoint) => (
+  (dispatch) => {
+    if (data.length > 0) {
+      const sqlStr = `UPDATE Employee
+      SET Point = (Point + ${TotalPoint})
+      WHERE ID = '${EmployeeID}'`;
+      dispatch({ type: DIALOG, dialog: { show: true, text: '回復點數中' } });
+      const connection = ADODB.open(connectString);
+      connection
+        .execute(sqlStr)
+        .then(() =>
+          dispatch(deleteRecord(Guid, EmployeeID, WelfareGuid)))
+        .catch(error =>
+          dispatch({ type: DIALOG, dialog: { show: true, text: 'Error' }, dbstate: error }));
+    } else {
+      dispatch({ type: DIALOG, dialog: { show: true, text: 'No Data' } });
+    }
+  }
+);
+export const deleteRecord = (Guid, EmployeeID, WelfareGuid) => (
+  (dispatch) => {
+    const sqlStr = `DELETE FROM (SELECT * FROM WelfareRecord WHERE GuidKey = '${Guid}' AND EmployeeID = '${EmployeeID}' AND WelfareGuid = '${WelfareGuid}')`;
+    dispatch({ type: DIALOG, dialog: { show: true, text: '回復點數中' } });
+    const connection = ADODB.open(connectString);
+    connection
+      .execute(sqlStr)
+      .then(() =>
+        dispatch({ type: RELOAD_ALL, dialog: { show: false, text: 'OK' } }))
+      .catch(error =>
+        dispatch({ type: DIALOG, dialog: { show: true, text: 'Error' }, dbstate: error }));
+  }
+);
+/*
+export const deleteWelfareRecord = (Guid, EmployeeID, WelfareGuid) => (
+  (dispatch) => {
+    const sqlStr = `DELETE FROM WelfareRecord WHERE GuidKey = ${Guid} AND EmployeeID = ${EmployeeID} AND WelfareGiod = ${WelfareGuid}`;
+    dispatch({ type: DIALOG, dialog: { show: true, text: '刪除中' } });
+    const connection = ADODB.open(connectString);
+    connection
+      .execute(sqlStr)
+      .then(() =>
+        dispatch({ type: RELOAD_EMPLOYEE, dialog: { show: false, text: 'OK' } }))
+      .catch(error =>
+        dispatch({ type: DIALOG, dialog: { show: true, text: 'Error' }, dbstate: error }));
+  }
+);
+*/

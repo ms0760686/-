@@ -101,6 +101,18 @@ export default class Test extends Component<Props> {
     setTimeout(this.props.readWelfare(), 1000);
     setTimeout(this.props.readWelfareRecord(), 1500);
   }
+  ReloadExport = () => {
+    setTimeout(this.props.exportRecord(), 0);
+  }
+  ReloadWelfare = () => {
+    setTimeout(this.props.readWelfare(), 0);
+  }
+  ReloadEmployee = () => {
+    setTimeout(this.props.readEmployee(), 0);
+  }
+  ReloadWelfareRecord = () => {
+    setTimeout(this.props.readWelfareRecord(), 0);
+  }
   // onClick={() => { this.createDialog('新增福委會資料', Welfarefomat, createWelfare); }}>
   // onClick={() => { this.props.createEmployee('k', 'l', 'l'); }}>
   // <Table data={payload} />
@@ -117,9 +129,6 @@ export default class Test extends Component<Props> {
         </div>
         <div className={styles.line} />
         <div className="col-4">
-          <Button bsStyle="primary" bsSize="large" onClick={this.Reload}>
-            Refresh
-          </Button>
           <Button bsStyle="primary" bsSize="large" onClick={() => this.setState({ passLog: { ...this.state.passLog, accInfo: this.props.accInfo, show: true } })}>
             更改SA密碼
           </Button>
@@ -132,22 +141,23 @@ export default class Test extends Component<Props> {
           <Panel.Heading>
             <h3 className={styles.title}>
               福委會資料
+              <Button bsStyle="primary" bsSize="large" onClick={this.ReloadWelfare}>
+              Refresh
+              </Button>
             </h3>
           </Panel.Heading>
           <Panel.Body>
-            <Form horizontal>
-              <WelfareTable
-                data={welfare}
-                deleteFun={deleteWelfare}
-                createFun={createWelfare}
-                editFun={editWelfare}
-                delete
-                insertRow
-                cellEdit
-                new
-                selectRow
-              />
-            </Form>
+            <WelfareTable
+              data={welfare}
+              deleteFun={deleteWelfare}
+              createFun={createWelfare}
+              editFun={editWelfare}
+              delete
+              insertRow
+              cellEdit
+              new
+              selectRow
+            />
           </Panel.Body>
         </Panel>
         <div className={styles.line} />
@@ -155,17 +165,18 @@ export default class Test extends Component<Props> {
           <Panel.Heading>
             <h3 className={styles.title}>
             員工資料
+              <Button bsStyle="primary" bsSize="large" onClick={this.ReloadEmployee}>
+              Refresh
+              </Button>
             </h3>
           </Panel.Heading>
           <Panel.Body>
-            <Form horizontal>
-              <EmployeeTable
-                data={employee}
-                deleteFun={deleteEmployee}
-                createFun={createEmployee}
-                editFun={editEmployee}
-              />
-            </Form>
+            <EmployeeTable
+              data={employee}
+              deleteFun={deleteEmployee}
+              createFun={createEmployee}
+              editFun={editEmployee}
+            />
           </Panel.Body>
         </Panel>
         <div className={styles.line} />
@@ -173,40 +184,42 @@ export default class Test extends Component<Props> {
           <Panel.Heading>
             <h3 className={styles.title}>
             紀錄
+              <Button bsStyle="primary" bsSize="large" onClick={this.ReloadWelfareRecord}>
+              Refresh
+              </Button>
             </h3>
           </Panel.Heading>
           <Panel.Body>
-            <Form horizontal>
-              <WelfareRecordTable
-                data={this.props.welfareRecord}
-                createFun={this.props.crateWelfareRecord}
-                createRecordFun={this.props.crateWelfareRecord}
-                insertRow={false}
-                cellEdit={false}
-                selectRow={false}
-                setDialog={this.props.setDialog}
-              />
-            </Form>
+            <WelfareRecordTable
+              data={this.props.welfareRecord}
+              createFun={this.props.crateWelfareRecord}
+              createRecordFun={this.props.crateWelfareRecord}
+              insertRow={false}
+              cellEdit={false}
+              selectRow={false}
+              setDialog={this.props.setDialog}
+            />
           </Panel.Body>
         </Panel>
         <Panel bsStyle="success">
           <Panel.Heading>
             <h3 className={styles.title}>
             總計匯出預覽
+              <Button bsStyle="primary" bsSize="large" onClick={this.ReloadExport}>
+              Refresh
+              </Button>
             </h3>
           </Panel.Heading>
           <Panel.Body>
-            <Form horizontal>
-              <ExportRecordTable
-                data={this.props.exportWelfare}
-                createFun={this.props.crateWelfareRecord}
-                createRecordFun={this.props.crateWelfareRecord}
-                insertRow={false}
-                cellEdit={false}
-                selectRow={false}
-                setDialog={this.props.setDialog}
-              />
-            </Form>
+            <ExportRecordTable
+              data={this.props.exportWelfare}
+              createFun={this.props.crateWelfareRecord}
+              createRecordFun={this.props.crateWelfareRecord}
+              insertRow={false}
+              cellEdit={false}
+              selectRow={false}
+              setDialog={this.props.setDialog}
+            />
           </Panel.Body>
         </Panel>
         <Dialog

@@ -32,13 +32,14 @@ export default class table extends Component<Props> {
   sum = (target, bool) => {
     let SumTotalPoints = 0;
     const arrObj = JSON.parse(JSON.stringify(target));
-    for (let i = 0; i < arrObj.length - 1; i += 1) {
+    for (let i = 0; i < arrObj.length; i += 1) {
       SumTotalPoints += arrObj[i].TotalPoints;
       for (let j = i + 1; j < arrObj.length; j += 1) {
         if (bool) {
           if (arrObj[j].EmployeeID === arrObj[i].EmployeeID &&
             arrObj[j].WelfareGuid === arrObj[i].WelfareGuid) {
             arrObj[i].TotalPoints += arrObj[j].TotalPoints;
+            SumTotalPoints += arrObj[j].TotalPoints;
             arrObj.splice(j, 1);
             j -= 1;
           }
