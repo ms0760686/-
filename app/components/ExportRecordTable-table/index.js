@@ -38,6 +38,7 @@ export default class table extends Component<Props> {
         if (bool) {
           if (arrObj[j].EmployeeID === arrObj[i].EmployeeID &&
             arrObj[j].WelfareGuid === arrObj[i].WelfareGuid) {
+            arrObj[i].Num += arrObj[j].Num;
             arrObj[i].TotalPoints += arrObj[j].TotalPoints;
             SumTotalPoints += arrObj[j].TotalPoints;
             arrObj.splice(j, 1);

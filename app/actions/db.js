@@ -26,7 +26,7 @@ export function memberSys(data) {
   }
   return false;
 }
-const connectString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=\\\\NTSERVER\\AECaspWeb\\yunchung_test\\testDB\\test.mdb;';
+const connectString = 'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=\\\\NTSERVER\\AECaspWeb\\yunchung_test\\test.mdb;';
 export function readEmployee(ID) {
   return (dispatch) => {
     dispatch({ type: READ_EMPLOYEE_DATABASE, dialog: { show: true, text: 'Loading' } });
